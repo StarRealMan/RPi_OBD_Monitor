@@ -25,16 +25,15 @@ class GUI():
                 if val >= pow(10, self.int_places):
                     str_val = '9' * self.int_places
                 else:
-                    str_val = str(int(val)).zfill(self.int_places)
+                    str_val = str(round(val)).zfill(self.int_places)
             else:
                 if val >= pow(10, self.int_places):
                     str_int = '9' * self.int_places
                     str_dec = '9' * self.dec_places
                 else:
-                    [str_int, str_dec] = str(float(val)).split('.')
+                    val = ("%." + str(self.dec_places) + "f") % float(val)
+                    [str_int, str_dec] = val.split('.')
                     str_int = str_int.zfill(self.int_places)
-                    str_dec = ("%." + str(self.dec_places) + "f") % float(str_dec)
-                    str_dec = str_dec.split('.')[-1]
                     
                 str_val = str_int + '.' + str_dec
             
@@ -73,6 +72,7 @@ class GUI():
                 val_pose = (val_pose[0], val_pose[1] + val_size[1] * (1 - val_portion))
                 val_size = (val_size[0], val_size[1] * val_portion)
             
+            val_size = (int(val_size[0]), int(val_size[1]))
             bar = pygame.Surface(val_size, flags = pygame.HWSURFACE)
             bar.fill(self.color)
             
@@ -118,18 +118,18 @@ class GUI():
         self.componet = [
             None, 
             None, 
-            self.GUI_Bar((50, 50), (50, 500), (255, 0, 0), 0, 100, "^"), 
-            self.GUI_Bar((924, 50), (50, 500), (0, 0, 255), 0, 100, "^"), 
-            self.GUI_Meter((137, 51), (300, 300), 0, 100, pointer_path), 
-            self.GUI_Meter((587, 51), (300, 300), 0, 100, pointer_path), 
-            self.GUI_Digit((162, 400), 40, (0, 0, 0), font_path, 2, 1), 
-            self.GUI_Digit((334, 400), 40, (0, 0, 0), font_path, 2, 1), 
+            self.GUI_Bar((50, 50), (50, 500), (255, 0, 0), 0.0, 100.0, "^"), 
+            self.GUI_Bar((924, 50), (50, 500), (0, 0, 255), 0.0, 100.0, "^"), 
+            self.GUI_Meter((137, 51), (300, 300), 20.0, 120.0, pointer_path), 
+            self.GUI_Meter((587, 51), (300, 300), 50.0, 150.0, pointer_path), 
+            self.GUI_Digit((162, 400), 40, (0, 0, 0), font_path, 3, 0), 
+            self.GUI_Digit((334, 400), 40, (0, 0, 0), font_path, 3, 0), 
             self.GUI_Digit((560, 400), 40, (0, 0, 0), font_path, 2, 1), 
             self.GUI_Digit((742, 400), 40, (0, 0, 0), font_path, 2, 1), 
-            self.GUI_Meter((437, 15), (150, 150), 0, 100, pointer_path), 
-            self.GUI_Meter((437, 248), (150, 150), 0, 100, pointer_path), 
+            self.GUI_Meter((437, 15), (150, 150), 94.0, 104.0, pointer_path), 
+            self.GUI_Meter((437, 248), (150, 150), -40.0, 60.0, pointer_path), 
             None, 
-            self.GUI_Bar((162, 510), (700, 50), (0, 255, 0), 0, 100, ">")
+            self.GUI_Bar((162, 510), (700, 50), (0, 255, 0), 11.0, 15.0, ">")
         ]
         
         self.foreground = pygame.image.load(foreground_path).convert_alpha()
@@ -138,17 +138,26 @@ class GUI():
         # self.obd = obd_interface.OBD()
         # cmd_list = list(range(len(self.obd.info_list)))
         # self.obd.register_cmd_watch(cmd_list)
-
-        self.init = 100
     
     def read_obd(self):
         # result = self.obd.query_cmd()
         
-        if self.init > 100:
-            self.init = 0
-            
-        result = [self.init] * 14
-        self.init += 1
+        result = [
+            0.0, 
+            0.0, 
+            50.0, 
+            50.0, 
+            35.0, 
+            89.4, 
+            120, 
+            140, 
+            12.5, 
+            43.6, 
+            101, 
+            20.5, 
+            0.0, 
+            13.5
+        ]
         
         return result
     
