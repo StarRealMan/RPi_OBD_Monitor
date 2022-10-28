@@ -1,8 +1,5 @@
 import pygame_gui
-
-def main():
-    pass
-    
-    
+            
 if __name__ == "__main__":
-    main()
+    gui = pygame_gui.GUI()
+    gui.run()
