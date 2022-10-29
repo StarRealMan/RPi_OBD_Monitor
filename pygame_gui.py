@@ -1,6 +1,6 @@
 import pygame
 import sys
-# import obd_interface
+import obd_interface
             
 class GUI():
     
@@ -103,10 +103,10 @@ class GUI():
         pygame.display.set_caption("RPi ODB Monitor v1.0")
         
         # for pc debug
-        self.screen = pygame.display.set_mode((1024, 600))
+        # self.screen = pygame.display.set_mode((1024, 600))
         
         # for pi
-        # self.screen = pygame.display.set_mode((1024, 600), flags = pygame.FULLSCREEN)
+        self.screen = pygame.display.set_mode((1024, 600), flags = pygame.FULLSCREEN)
         
         self.clock = pygame.time.Clock()
         
@@ -135,29 +135,29 @@ class GUI():
         self.foreground = pygame.image.load(foreground_path).convert_alpha()
         self.background = pygame.image.load(background_path).convert()
         
-        # self.obd = obd_interface.OBD()
-        # cmd_list = list(range(len(self.obd.info_list)))
-        # self.obd.register_cmd_watch(cmd_list)
+        self.obd = obd_interface.OBD()
+        cmd_list = list(range(len(self.obd.info_list)))
+        self.obd.register_cmd_watch(cmd_list)
     
     def read_obd(self):
-        # result = self.obd.query_cmd()
+        result = self.obd.query_cmd()
         
-        result = [
-            0.0, 
-            0.0, 
-            50.0, 
-            50.0, 
-            35.0, 
-            89.4, 
-            120, 
-            140, 
-            12.5, 
-            43.6, 
-            101, 
-            20.5, 
-            0.0, 
-            13.5
-        ]
+        # result = [
+        #     0.0, 
+        #     0.0, 
+        #     50.0, 
+        #     50.0, 
+        #     35.0, 
+        #     89.4, 
+        #     120, 
+        #     140, 
+        #     12.5, 
+        #     43.6, 
+        #     101, 
+        #     20.5, 
+        #     0.0, 
+        #     13.5
+        # ]
         
         return result
     
