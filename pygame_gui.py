@@ -136,6 +136,10 @@ class GUI():
         self.background = pygame.image.load(background_path).convert()
         
         self.obd = obd_interface.OBD()
+        if not self.obd.get_connection_status():
+            pygame.quit()
+            sys.exit()
+        
         cmd_list = list(range(len(self.obd.info_list)))
         self.obd.register_cmd_watch(cmd_list)
     

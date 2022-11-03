@@ -2,14 +2,9 @@ import obd
 
 class OBD():
     def __init__(self):
-        
         obd.logger.setLevel(obd.logging.DEBUG)
-        self.connection = obd.Async("/dev/rfcomm0", protocol="6", baudrate="38400", 
-                                    fast=False, timeout = 30)
-        while len(self.connection.supported_commands) < 100:
-            self.connection = obd.Async("/dev/rfcomm0", protocol="6", baudrate="38400", 
-                                        fast=False, timeout = 30)
-
+        self.connect_obd()
+        
         self.info_list = [
             # Drive
             "RPM", 
@@ -33,6 +28,30 @@ class OBD():
             "GET_DTC",
             "CONTROL_MODULE_VOLTAGE",               # Battery Voltage
         ]
+
+    def connect_obd(self):
+        ports = obd.scan_serial()
+        print("Available ports: ", ports)
+        
+        self.connection_status = False
+        for try_num in range(4):
+            self.connection = obd.Async("/dev/rfcomm0", protocol="6", baudrate="38400", 
+                                        fast=False, timeout = 30)
+            
+            status = self.connection.status()
+            if status == obd.OBDStatus.NOT_CONNECTED:
+                print("Not Connected")
+            elif status == obd.OBDStatus.ELM_CONNECTED:
+                print("ELM Connected")
+            elif status == obd.OBDStatus.OBD_CONNECTED:
+                print("OBD Connected")
+            elif status == obd.OBDStatus.CAR_CONNECTED:
+                print("Car Connected")
+                self.connection_status = True
+                break
+    
+    def get_connection_status(self):
+        return self.connection_status
 
     def cmd_id_2_name(self, id):
         return self.info_list[id]
