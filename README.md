@@ -24,3 +24,7 @@ GUI monitor of car information using OBD interface on a Raspberry Pi.
 `python main.py`
 
 3. exit by clicking blue 'X' on the top-right corner
+
+## TODO
+
+Add gyro and acc meter to get acceleration and rotation information.
