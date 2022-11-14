@@ -1,7 +1,8 @@
 import pygame
 import sys
 import obd_interface
-            
+import imu
+
 class GUI():
     
     class GUI_Digit():
