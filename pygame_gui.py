@@ -103,10 +103,10 @@ class GUI():
         pygame.display.set_caption("RPi ODB Monitor v1.0")
         
         # for pc debug
-        # self.screen = pygame.display.set_mode((1024, 600))
+        self.screen = pygame.display.set_mode((1024, 600))
         
-        # for pi
-        self.screen = pygame.display.set_mode((1024, 600), flags = pygame.FULLSCREEN)
+        # for rpi
+        # self.screen = pygame.display.set_mode((1024, 600), flags = pygame.FULLSCREEN)
         
         self.clock = pygame.time.Clock()
         
@@ -145,23 +145,6 @@ class GUI():
     
     def read_obd(self):
         result = self.obd.query_cmd()
-        
-        # result = [
-        #     0.0, 
-        #     0.0, 
-        #     50.0, 
-        #     50.0, 
-        #     35.0, 
-        #     89.4, 
-        #     120, 
-        #     140, 
-        #     12.5, 
-        #     43.6, 
-        #     101, 
-        #     20.5, 
-        #     0.0, 
-        #     13.5
-        # ]
         
         return result
     
