@@ -13,6 +13,7 @@ class IMU():
         
         self.acc = np.array([0.0, 0.0, 0.0])
         self.gyro = np.array([0.0, 0.0, 0.0])
+        self.gyro_bias = np.array([0.0, 0.0, 0.0])
         
         self.eular_angle = np.array([0, 0, 0])      # Order: RPY
         self.quaternion = np.array([1, 0, 0, 0])
@@ -78,7 +79,7 @@ class IMU():
         return self.acc
     
     def mahony(self):
-        raw_gyro = self.get_gyro()
+        raw_gyro = self.get_gyro() - self.gyro_bias
         
         raw_acc = self.get_acc()
         norm_acc = raw_acc / np.linalg.norm(raw_acc)
