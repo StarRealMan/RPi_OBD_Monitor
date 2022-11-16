@@ -86,13 +86,17 @@ class IMU():
         error_z = np.cross(norm_acc, self.world_z)
         self.error_z_int += self.ki * error_z * self.dt
         pseudo_gyro = raw_gyro + self.kp * error_z + self.error_z_int
+        
         delta_angel = pseudo_gyro * self.dt
+        delta_angel_mat = np.array([
+            [0, -delta_angel[0], -delta_angel[1], -delta_angel[2]],
+            [delta_angel[0], 0, delta_angel[2], -delta_angel[1]],
+            [delta_angel[1], -delta_angel[2], 0, delta_angel[0]],
+            [delta_angel[2], delta_angel[1], -delta_angel[0], 0]
+        ])
         
         last_quaternion = self.quaternion.copy()
-        self.quaternion[0] = last_quaternion[0] + 0.5 * (-last_quaternion[1] * delta_angel[0] - last_quaternion[2] * delta_angel[1] - last_quaternion[3] * delta_angel[2])
-        self.quaternion[1] = last_quaternion[1] + 0.5 * (last_quaternion[0] * delta_angel[0] + last_quaternion[2] * delta_angel[2] - last_quaternion[3] * delta_angel[1])
-        self.quaternion[2] = last_quaternion[2] + 0.5 * (last_quaternion[0] * delta_angel[1] - last_quaternion[1] * delta_angel[2] + last_quaternion[3] * delta_angel[0])
-        self.quaternion[3] = last_quaternion[3] + 0.5 * (last_quaternion[0] * delta_angel[2] + last_quaternion[1] * delta_angel[1] - last_quaternion[2] * delta_angel[0])
+        self.quaternion = last_quaternion + 0.5 * delta_angel_mat @ last_quaternion
         
         self.quaternion = self.quaternion / np.linalg.norm(self.quaternion)
         self.quaternion_square = self.quaternion * self.quaternion
