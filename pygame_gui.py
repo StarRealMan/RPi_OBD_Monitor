@@ -1,7 +1,7 @@
 import pygame
 import sys
-import obd_interface
-import imu
+# import obd_interface
+# import imu
 
 class GUI():
     
@@ -104,7 +104,7 @@ class GUI():
             self.pose = pose
             self.size = size
             self.color = color
-            self.width = int(size / 10)
+            self.width = int(size / 20)
             self.max_val = max_val
             
         def render(self, screen, val):
@@ -116,7 +116,7 @@ class GUI():
             end_pose = (end_pos_x, end_pos_y)
             
             pygame.draw.line(screen, self.color, self.pose, end_pose, self.width)
-            pygame.draw.circle(screen, self.color, self.pose, self.width * 3)
+            pygame.draw.circle(screen, self.color, end_pose, self.width * 2)
             
             screen.blit(screen, (0, 0))
     class GUI_Car_Rot():
@@ -127,7 +127,7 @@ class GUI():
             self.image = pygame.transform.scale(self.image, size)
             
         def render(self, screen, val):
-            rot_image = pygame.transform.rotate(self.image, val)
+            rot_image = pygame.transform.rotate(self.image, -val)
             rot_rect = rot_image.get_rect()
             rot_rect.centerx = self.pose[0]
             rot_rect.centery = self.pose[1]
@@ -180,9 +180,9 @@ class GUI():
         # self.obd.register_cmd_watch(cmd_list)
                 
         self.imu_component = [
-            self.GUI_Acc_Ball((512, 205), 80, (255, 190, 0), 0.5), 
-            self.GUI_Car_Rot((880, 45), 80, car_roll_rot), 
-            self.GUI_Car_Rot((630, 45), 80, car_pitch_rot)
+            self.GUI_Acc_Ball((509, 206), 80, (255, 190, 0), 0.5), 
+            self.GUI_Car_Rot((815, 0), (80, 80), car_roll_rot), 
+            self.GUI_Car_Rot((580, 0), (80, 80), car_pitch_rot)
         ]
         
         # self.imu = imu.IMU(1.0/60)
@@ -209,14 +209,16 @@ class GUI():
         
     def render_dynamic(self):
         # result = self.read_obd()
-        result = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        result = [0.0, 0.0, 50.0, 50.0, 35.0, 89.4, 120, 
+                  140, 12.5, 43.6, 101, 20.5, 0.0, 13.5]
         
         for id, item in enumerate(self.componet):
             if item != None:
                 val = result[id]
                 item.render(self.screen, val)
        
-        imu_result = self.read_imu()
+        # imu_result = self.read_imu()
+        imu_result = [(0.2, 0.3), 30, 20]
         
         for id, item in enumerate(self.imu_component):
             if item != None:
