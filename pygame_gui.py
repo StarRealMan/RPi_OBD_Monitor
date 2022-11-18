@@ -99,6 +99,41 @@ class GUI():
             
             screen.blit(rot_pointer, rot_rect)
             
+    class GUI_Acc_Ball():
+        def __init__(self, pose, size, color, max_val):
+            self.pose = pose
+            self.size = size
+            self.color = color
+            self.width = int(size / 10)
+            self.max_val = max_val
+            
+        def render(self, screen, val):
+            x_val_portion = val[0] / self.max_val
+            y_val_portion = val[1] / self.max_val
+            
+            end_pos_x = self.pose[0] + x_val_portion * self.size / 2
+            end_pos_y = self.pose[1] - y_val_portion * self.size / 2
+            end_pose = (end_pos_x, end_pos_y)
+            
+            pygame.draw.line(screen, self.color, self.pose, end_pose, self.width)
+            pygame.draw.circle(screen, self.color, self.pose, self.width * 3)
+            
+            screen.blit(screen, (0, 0))
+    class GUI_Car_Rot():
+        def __init__(self, pose, size, car_path):
+            self.pose = (pose[0] + size[0] / 2, pose[1] + size[1] / 2)
+            
+            self.image = pygame.image.load(car_path).convert_alpha()
+            self.image = pygame.transform.scale(self.image, size)
+            
+        def render(self, screen, val):
+            rot_image = pygame.transform.rotate(self.image, val)
+            rot_rect = rot_image.get_rect()
+            rot_rect.centerx = self.pose[0]
+            rot_rect.centery = self.pose[1]
+            
+            screen.blit(rot_image, rot_rect)
+            
     def __init__(self):
         pygame.init()
         pygame.display.set_caption("RPi ODB Monitor v1.0")
@@ -115,6 +150,9 @@ class GUI():
         font_path = "assets/digifaw.ttf"
         foreground_path = "assets/foreground.png"
         background_path = "assets/background.png"
+        
+        car_roll_rot = "assets/car_roll.png"
+        car_pitch_rot = "assets/car_pitch.png"
         
         self.componet = [
             None, 
@@ -133,21 +171,35 @@ class GUI():
             self.GUI_Bar((162, 510), (700, 50), (0, 255, 0), 11.0, 15.0, ">")
         ]
         
+        # self.obd = obd_interface.OBD()
+        # if not self.obd.get_connection_status():
+        #     pygame.quit()
+        #     sys.exit()
+
+        # cmd_list = list(range(len(self.obd.info_list)))
+        # self.obd.register_cmd_watch(cmd_list)
+                
+        self.imu_component = [
+            self.GUI_Acc_Ball((512, 205), 80, (255, 190, 0), 0.5), 
+            self.GUI_Car_Rot((880, 45), 80, car_roll_rot), 
+            self.GUI_Car_Rot((630, 45), 80, car_pitch_rot)
+        ]
+        
+        # self.imu = imu.IMU(1.0/60)
+        
         self.foreground = pygame.image.load(foreground_path).convert_alpha()
         self.background = pygame.image.load(background_path).convert()
-        
-        self.obd = obd_interface.OBD()
-        if not self.obd.get_connection_status():
-            pygame.quit()
-            sys.exit()
-        
-        cmd_list = list(range(len(self.obd.info_list)))
-        self.obd.register_cmd_watch(cmd_list)
     
     def read_obd(self):
         result = self.obd.query_cmd()
         
         return result
+    
+    def read_imu(self):
+        eular_angle = self.imu.mahony()
+        xy_acc, z_acc = self.imu.g_ball()
+        
+        return (xy_acc[0], xy_acc[1]), eular_angle[0], eular_angle[1]
     
     def render_foreground(self):
         self.screen.blit(self.foreground, (0, 0))
@@ -156,15 +208,24 @@ class GUI():
         self.screen.blit(self.background, (0, 0))
         
     def render_dynamic(self):
-        result = self.read_obd()
+        # result = self.read_obd()
+        result = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        
         for id, item in enumerate(self.componet):
             if item != None:
                 val = result[id]
                 item.render(self.screen, val)
        
+        imu_result = self.read_imu()
+        
+        for id, item in enumerate(self.imu_component):
+            if item != None:
+                val = imu_result[id]
+                item.render(self.screen, val)
+       
     def run(self):
         while True:
-            self.clock.tick(30)
+            self.clock.tick(60)
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
